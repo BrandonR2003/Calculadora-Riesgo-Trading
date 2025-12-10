@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cal Automática - Opciones de Riesgo</title>
+  <link rel="icon" href="logo.ico">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+      background-color: #121212;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    #container {
+      display: flex;
+      gap: 40px;
+      transition: all 0.5s ease;
+    }
+
+    .card {
+      background-color: #1e1e1e;
+      padding: 20px;
+      border-radius: 20px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+      width: 350px;
+      transition: all 0.5s ease;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 1px;
+      color: #fff;
+    }
+
+    label {
+      display: block;
+      margin-top: 2px;
+      font-size: 0.9rem;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 4px;
+      margin-top: 2px;
+      background-color: #2c2c2c;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-size: 0.8rem;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 15px;
+      padding: 8px;
+      background-color: #0a84ff;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #006be6;
+    }
+
+    #resultCard, #tpCard {
+      display: none;
+    }
+
+    .result {
+      font-size: 1rem;
+      margin-top: 6px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 0.85rem;
+    }
+
+    th, td {
+      border: 1px solid #333;
+      padding: 6px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #2c2c2c;
+    }
+
+    .be-row {
+      background-color: #ffffff33;
+      font-weight: bold;
+    }
+
+    .tp-final-row {
+      background-color: #cecece59;
+      font-weight: bold;
+      color: #ffffff;
+    }
+
+    .valid-row {
+      background-color: #143d14; /* verde oscuro */
+      color: #dfffe0;
+    }
+
+    .best-row {
+      background-color: #2a7f2a; /* verde más brillante */
+      color: white;
+      font-weight: bold;
+    }
+
+    /* ------------------------------------------------------------------
+       RESPONSIVE PARA CELULAR
+    ------------------------------------------------------------------ */
+    @media (max-width: 600px) {
+      body {
+        height: auto;
+        padding: 20px 0;
+        align-items: flex-start;
+        display: flex;
+        justify-content: center;
+      }
+
+      #container {
+        flex-direction: column;
+        gap: 20px;
+        width: 100%;
+        padding: 0 15px;
+        justify-content: center;
+      }
+
+      .card {
+        width: 100% !important;
+        max-width: 350px;
+        margin: auto;
+        box-sizing: border-box;
+        padding: 15px;
+      }
+
+      h2 {
+        font-size: 1.3rem;
+      }
+
+      input, select {
+        font-size: 0.95rem;
+        padding: 8px;
+      }
+
+      button {
+        padding: 12px;
+        font-size: 1rem;
+      }
+
+      table {
+        font-size: 0.8rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="container">
+
+    <!-- TARJETA DE DATOS -->
+    <div class="card" id="inputCard">
+      <h2>DATOS</h2>
+
+      <label for="symbol">Divisa:</label>
+      <select id="symbol">
+        <option value="EUR/USD">EUR/USD</option>
+        <option value="USD/JPY">USD/JPY</option>
+        <option value="GBP/USD">GBP/USD</option>
+        <option value="XAU/USD_OANDA">XAU/USD OANDA</option>
+        <option value="XAU/USD">XAU/USD IC Markets</option>
+      </select>
+
+      <label for="apalancamiento">Apalancamiento:</label>
+      <select id="apalancamiento">
+        <option value="25">1:25</option>
+        <option value="40">1:40</option>
+        <option value="75">1:75</option>
+      </select>
+
+      <label for="comision">Tipo de Cuenta:</label>
+      <select id="comision">
+        <option value="7">Apollo</option>
+        <option value="6">Personal</option>
+        <option value="0">TradingView</option>
+      </select>
+
+      <label for="capital">Capital ($):</label>
+      <select id="capital">
+        <option value="1000">$1,000</option>
+        <option value="5000">$5,000</option>
+        <option value="6000">$6,000</option>
+        <option value="10000">$10,000</option>
+        <option value="15000">$15,000</option>
+        <option value="20000">$20,000</option>
+        <option value="25000">$25,000</option>
+        <option value="50000">$50,000</option>
+        <option value="100000">$100,000</option>
+        <option value="200000">$200,000</option>
+      </select>
+
+      <label for="entrada">Precio de Entrada:</label>
+      <input type="number" id="entrada" step="0.01" />
+
+      <label for="type">Tipo de Orden:</label>
+      <select id="type">
+        <option value="buy">Buy</option>
+        <option value="sell">Sell</option>
+      </select>
+
+      <label for="tpTics">Tics TP:</label>
+      <input type="number" inputmode="numeric" pattern="[0-9]" id="tpTics" step="1" />
+
+      <label for="slTics">Tics SL:</label>
+      <input type="number" inputmode="numeric" pattern="[0-9]" id="slTics" step="1" />
+
+      <label for="riesgo">Riesgo (% default):</label>
+      <select id="riesgo">
+        <option value="1">1%</option>
+        <option value="0.5">0.50%</option>
+        <option value="0.25">0.25%</option>
+        <option value="0.20">0.20%</option>
+        <option value="0.15">0.15%</option>
+        <option value="0.125">0.125%</option>
+        <option value="0.10">0.10%</option>
+        <option value="0.05">0.05%</option>
+      </select>
+
+      <label for="riskList">Lista de riesgos a evaluar (%, coma-separated):</label>
+      <input id="riskList" value="0.05,0.075,0.1,0.125,0.15,0.2,0.25,0.5,1" />
+
+      <button onclick="calcular()">Calcular</button>
+    </div>
+
+    <!-- RESULTADOS -->
+    <div class="card" id="resultCard">
+      <h2>RESULTADOS</h2>
+      <br>
+      <div class="result" id="lotajeResult"></div>
+      <div class="result" id="tamanoResult"></div>
+      <div class="result" id="rrResult"></div>
+      <div class="result" id="MargenResult"></div>
+      <div class="result" id="ComisionResult"></div>
+      <br>
+      <div class="result" id="tpPriceResult"></div>
+      <div class="result" id="profitResult"></div>
+      <div class="result" id="profitBrut"></div>
+      <div class="result" id="Profit%"></div>
+      <br>
+      <div class="result" id="slPriceResult"></div>
+      <div class="result" id="lossResult"></div>
+      <div class="result" id="LossBrut"></div>
+      <div class="result" id="Loss%"></div>
+
+      <br>
+      <h3 style="text-align:center;margin:6px 0 0 0;">Opciones de riesgo (tics ≥ SL)</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Riesgo %</th>
+            <th>Lotaje</th>
+            <th>TicsMáx (para consumir riesgo)</th>
+            <th>Gap (TicsMáx - SL)</th>
+            <th>Válido</th>
+          </tr>
+        </thead>
+        <tbody id="riskOptionsTable"></tbody>
+      </table>
+    </div>
+
+    <!-- TP PARCIALES -->
+    <div class="card" id="tpCard">
+      <h2>TP PARCIALES</h2>
+      <br>
+      <table>
+        <thead>
+          <tr>
+            <th>R</th>
+            <th>%</th>
+            <th>Tics</th>
+            <th>Precio</th>
+            <th>Profit Neto</th>
+          </tr>
+        </thead>
+        <tbody id="tpTable"></tbody>
+      </table>
+    </div>
+
+  </div>
+
+<script>
+function calcular() {
+  const capital = parseFloat(document.getElementById('capital').value);
+  const comision = parseFloat(document.getElementById('comision').value);
+  const riesgoPorcentaje = parseFloat(document.getElementById('riesgo').value);
+  const entrada = parseFloat(document.getElementById('entrada').value);
+  const slTics = parseFloat(document.getElementById('slTics').value);
+  const tpTics = parseFloat(document.getElementById('tpTics').value);
+  const tipoOrden = document.getElementById('type').value;
+  const simbolo = document.getElementById('symbol').value;
+  const apalancamiento = parseFloat(document.getElementById('apalancamiento').value);
+
+  if(!tpTics || !slTics || slTics <= 0) {
+    alert("Introduce tics de TP y SL mayores que 0.");
+    return;
+  }
+
+  // Parámetros por símbolo (igual que antes)
+  let valorPorTickPorLote, valorTickPrecio, decimales, contratos;
+  if(simbolo === "XAU/USD"){ 
+    valorPorTickPorLote = 1; valorTickPrecio = 0.01; decimales = 2; contratos = 100; 
+  } else if(simbolo === "XAU/USD_OANDA"){ 
+    valorPorTickPorLote = 0.1; valorTickPrecio = 0.001; decimales = 3; contratos = 100; 
+  } else if(simbolo === "EUR/USD"){ 
+    valorPorTickPorLote = 1; valorTickPrecio = 0.00001; decimales = 5; contratos = 100000;
+  } else if(simbolo === "GBP/USD"){ 
+    valorPorTickPorLote = 1; valorTickPrecio = 0.00001; decimales = 5; contratos = 100000;
+  } else if(simbolo === "USD/JPY"){ 
+    valorPorTickPorLote = 1; valorTickPrecio = 0.00001; decimales = 5; contratos = 100000;
+  } else {
+    valorPorTickPorLote = 1; valorTickPrecio = 0.0001; decimales = 5; contratos = 100000;
+  }
+
+  // Cálculo principal (usando el riesgo seleccionado por defecto para mostrar lotaje principal)
+  const RiesgoBruto = capital * (riesgoPorcentaje/100);
+  let lotajeRaw = RiesgoBruto / (slTics * valorPorTickPorLote + comision);
+  const DECIMALES_LOTE = 2;
+  const factor = Math.pow(10, DECIMALES_LOTE);
+  const LotajeNeto = Math.floor(lotajeRaw * factor) / factor;
+  const ComisionNeta = LotajeNeto * comision;
+
+  const TamanoNeto = LotajeNeto * 100000;
+  const MargenNeto = ((LotajeNeto * entrada) * contratos) / (apalancamiento || 1);
+  const rr = tpTics / slTics;
+
+  let precioTP = tipoOrden === "buy" ? entrada + tpTics * valorTickPrecio : entrada - tpTics * valorTickPrecio;
+  let precioSL = tipoOrden === "buy" ? entrada - slTics * valorTickPrecio : entrada + slTics * valorTickPrecio;
+
+  const profitBruto = tpTics * valorPorTickPorLote * LotajeNeto;
+  const lossBruto = slTics * valorPorTickPorLote * LotajeNeto;
+
+  const profitNeto = profitBruto - ComisionNeta;
+  const lossNeto = lossBruto + ComisionNeta;
+
+  const profitPorcent = (profitNeto / capital) * 100;
+  const lossPorcent = (lossNeto / capital) * 100;
+
+  const fmt = n => n.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+
+  document.getElementById('lotajeResult').textContent = `Lotaje (ej. para ${riesgoPorcentaje}%): ${LotajeNeto.toFixed(DECIMALES_LOTE)} Lotes`;
+  document.getElementById('tamanoResult').textContent = `Tamaño: ${TamanoNeto.toFixed(0)} Unidades`;
+  document.getElementById('rrResult').textContent = `Riesgo/Beneficio: 1:${rr.toFixed(0)}`;
+  document.getElementById('MargenResult').textContent = `Margen: $${fmt(MargenNeto)}`;
+  document.getElementById('ComisionResult').textContent = `Comisión: $${fmt(ComisionNeta)}`;
+  document.getElementById('tpPriceResult').textContent = `Precio TP: ${precioTP.toFixed(decimales)}`;
+  document.getElementById('profitResult').textContent = `Profit Neto: $${fmt(profitNeto)} USD`;
+  document.getElementById('profitBrut').textContent = `Profit S/C: $${fmt(profitBruto)} USD`;
+  document.getElementById('Profit%').textContent = `Profit (%): ${profitPorcent.toFixed(2)}%`;
+  document.getElementById('slPriceResult').textContent = `Precio SL: ${precioSL.toFixed(decimales)}`;
+  document.getElementById('lossResult').textContent = `Pérdida Neta: -$${fmt(lossNeto)} USD`;
+  document.getElementById('LossBrut').textContent = `Pérdida S/C: -$${fmt(lossBruto)} USD`;
+  document.getElementById('Loss%').textContent = `Pérdida (%): ${lossPorcent.toFixed(2)}%`;
+
+  // TP Table (misma lógica que antes)
+  const tbody = document.getElementById('tpTable');
+  tbody.innerHTML = "";
+
+  const ticsBE = LotajeNeto > 0 ? Math.ceil(ComisionNeta / (valorPorTickPorLote * LotajeNeto)) : 0;
+  const precioBE = tipoOrden === "buy" ? entrada + ticsBE * valorTickPrecio : entrada - ticsBE * valorTickPrecio;
+
+  tbody.insertAdjacentHTML("beforeend", `<tr class="be-row"><td>BE</td><td>BE</td><td>${ticsBE}</td><td>${precioBE.toFixed(decimales)}</td><td>$0.00</td></tr>`);
+
+  let lastTics = ticsBE;
+  const paso = riesgoPorcentaje;
+  let porcentajeActual = paso;
+  let rCont = 1;
+
+  while (true) {
+    let objetivoUSDNeto = capital * porcentajeActual / 100;
+    let ticsNecesarios = LotajeNeto > 0 ? Math.ceil((objetivoUSDNeto + ComisionNeta) / (valorPorTickPorLote * LotajeNeto)) : 0;
+
+    if (ticsNecesarios <= lastTics) break;
+
+    const precioParcial = tipoOrden === "buy" ? entrada + ticsNecesarios * valorTickPrecio : entrada - ticsNecesarios * valorTickPrecio;
+    const profitBrutoParcial = ticsNecesarios * valorPorTickPorLote * LotajeNeto;
+    const profitNetoParcial = profitBrutoParcial - ComisionNeta;
+
+    tbody.insertAdjacentHTML("beforeend", `
+      <tr>
+        <td>1:${rCont}</td>
+        <td>${porcentajeActual.toFixed((riesgoPorcentaje<1)?2:0)}%</td>
+        <td>${ticsNecesarios}</td>
+        <td>${precioParcial.toFixed(decimales)}</td>
+        <td>$${fmt(profitNetoParcial)}</td>
+      </tr>`);
+
+    lastTics = ticsNecesarios;
+    if (lastTics >= tpTics) break;
+
+    porcentajeActual += paso;
+    rCont++;
+
+    if (rCont > 100) break;
+  }
+
+  if (tpTics > lastTics) {
+    const precioFinal = tipoOrden === "buy" ? entrada + tpTics * valorTickPrecio : entrada - tpTics * valorTickPrecio;
+    const profitBrutoFinal = tpTics * valorPorTickPorLote * LotajeNeto;
+    const profitNetoFinal = profitBrutoFinal - ComisionNeta;
+    const porcentajeFinal = Math.ceil((profitNetoFinal / capital) * 100);
+
+    tbody.insertAdjacentHTML("beforeend", `
+      <tr class="tp-final-row">
+        <td>1:${rCont}</td>
+        <td>${porcentajeFinal}%</td>
+        <td>${tpTics}</td>
+        <td>${precioFinal.toFixed(decimales)}</td>
+        <td>$${fmt(profitNetoFinal)}</td>
+      </tr>`);
+  } else {
+    const filas = tbody.querySelectorAll("tr:not(.be-row)");
+    if (filas.length > 0) filas[filas.length-1].classList.add("tp-final-row");
+  }
+
+  // -----------------------------------------------------------
+  // NUEVA LÓGICA: Evaluar lista de riesgos y mostrar SOLO los válidos
+  // -----------------------------------------------------------
+  const riskListRaw = document.getElementById('riskList').value;
+  const riskArray = riskListRaw.split(',').map(s => parseFloat(s.trim())).filter(x => !isNaN(x) && x > 0);
+  const riskTable = document.getElementById('riskOptionsTable');
+  riskTable.innerHTML = "";
+
+  let validOptions = [];
+
+  // vamos a calcular para cada riesgo: lotaje (usando la misma fórmula con SL), comisión, ticsMax
+  riskArray.forEach(r => {
+    const RiesgoDinero = capital * (r / 100);
+
+    // lotaje usando la misma aproximación: (Riesgo) / (SL * valorPorTick + comision)
+    let lotRaw = RiesgoDinero / (slTics * valorPorTickPorLote + comision);
+    let lotRounded = Math.floor(lotRaw * factor) / factor;
+    if (lotRounded <= 0) return; // no aplicable
+
+    const comisionParaLot = lotRounded * comision;
+
+    // tics necesarios para consumir el riesgo completo con este lotaje
+    // ticsMax = (RiesgoDinero - comisionParaLot) / (valorPorTickPorLote * lotRounded)
+    // si comisionParaLot >= RiesgoDinero -> imposible
+    let ticsMaxRaw = (RiesgoDinero - comisionParaLot) / (valorPorTickPorLote * lotRounded);
+    let ticsMax = Math.ceil(ticsMaxRaw);
+
+    if (!isFinite(ticsMax) || ticsMax <= 0) return;
+
+    const gap = ticsMax - slTics;
+    const valido = ticsMax >= slTics;
+
+    validOptions.push({
+      riesgo: r,
+      lot: lotRounded,
+      ticsMax,
+      gap,
+      valido
+    });
+  });
+
+  // Filtrar SOLO válidos (ticsMax >= SL) como pediste
+  const validOnly = validOptions.filter(o => o.valido);
+
+  // Si hay válidos, marcar el "mejor" (el con gap mínimo >=0)
+  let bestIndex = -1;
+  if (validOnly.length > 0) {
+    let minGap = Number.POSITIVE_INFINITY;
+    validOnly.forEach((o, idx) => {
+      const absGap = Math.abs(o.gap);
+      if (absGap < minGap) {
+        minGap = absGap;
+        bestIndex = idx;
+      }
+    });
+  }
+
+  // render tabla (solo válidos) ordenada por cercanía de ticsMax a SL (opcional)
+  validOnly.sort((a,b) => Math.abs(a.gap) - Math.abs(b.gap));
+
+  validOnly.forEach((opt, idx) => {
+    const rowClass = (idx === bestIndex) ? "best-row" : "valid-row";
+    riskTable.insertAdjacentHTML('beforeend', `
+      <tr class="${rowClass}">
+        <td>${opt.riesgo}%</td>
+        <td>${opt.lot.toFixed(DECIMALES_LOTE)}</td>
+        <td>${opt.ticsMax}</td>
+        <td>${opt.gap >= 0 ? '+'+opt.gap : opt.gap}</td>
+        <td>Sí</td>
+      </tr>
+    `);
+  });
+
+  if (validOnly.length === 0) {
+    riskTable.insertAdjacentHTML('beforeend', `<tr><td colspan="5">No hay riesgos válidos para los ${slTics} tics ingresados.</td></tr>`);
+  }
+
+  // mostrar secciones
+  document.getElementById('resultCard').style.display='block';
+  document.getElementById('tpCard').style.display='block';
+  document.getElementById('container').style.justifyContent='flex-start';
+}
+</script>
+
+</body>
+</html>
