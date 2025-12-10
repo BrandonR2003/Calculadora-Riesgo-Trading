@@ -169,13 +169,15 @@
         <option value="XAU/USD">XAU/USD IC Markets</option>
       </select>
 
+      <br>
       <label for="comision">Tipo de Cuenta:</label>
       <select id="comision">
         <!-- valores = comisión por lote en USD -->
-        <option value="7">Apollo — $7 por lote</option>
-        <option value="6">Personal — $6 por lote</option>
+        <option value="7">Apollo</option>
+        <option value="6">Personal</option>
       </select>
 
+      <br>
       <label for="capital">Capital ($):</label>
       <select id="capital">
         <option value="1000">$1,000</option>
@@ -190,22 +192,23 @@
         <option value="200000">$200,000</option>
       </select>
 
+      <br>
       <label for="slTics">Tics SL:</label>
       <input type="number" inputmode="numeric" pattern="[0-9]" id="slTics" step="1" />
 
-      <button onclick="calcular()">Calcular opciones válidas</button>
+      <button onclick="calcular()">Calcular</button>
     </div>
 
     <!-- RESULTADOS: tabla de opciones válidas -->
     <div class="card" id="resultCard">
-      <h2>OPCIONES DE RIESGO (tics ≥ SL)</h2>
+      <h2>OPCIONES DE RIESGO</h2>
 
       <table>
         <thead>
           <tr>
             <th>Riesgo %</th>
             <th>Lotaje</th>
-            <th>TicsMáx</th>
+            <th>Tics Máximos</th>
             <th>Gap</th>
           </tr>
         </thead>
