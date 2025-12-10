@@ -2,113 +2,321 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Calculadora de Riesgo Minimalista</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cal Automática — Opciones de Riesgo</title>
+  <link rel="icon" href="logo.ico">
 
   <style>
+    /* === Estilo igual al original === */
     body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      background: #f7f7f7;
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+      background-color: #121212;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
     }
+
+    #container {
+      display: flex;
+      gap: 40px;
+      transition: all 0.5s ease;
+    }
+
     .card {
-      background: white;
+      background-color: #1e1e1e;
       padding: 20px;
-      border-radius: 12px;
-      max-width: 400px;
-      margin: auto;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      border-radius: 20px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+      width: 350px;
+      transition: all 0.5s ease;
     }
-    label { font-weight: bold; display: block; margin-top: 15px; }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 1px;
+      color: #fff;
+    }
+
+    label {
+      display: block;
+      margin-top: 2px;
+      font-size: 0.9rem;
+    }
+
     input, select {
       width: 100%;
-      padding: 8px;
-      margin-top: 5px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
+      padding: 4px;
+      margin-top: 2px;
+      background-color: #2c2c2c;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-size: 0.8rem;
       box-sizing: border-box;
     }
-    .result-box {
-      margin-top: 20px;
-      padding: 15px;
-      background: #e8f0fe;
-      border-radius: 8px;
+
+    button {
+      width: 100%;
+      margin-top: 15px;
+      padding: 8px;
+      background-color: #0a84ff;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
     }
-    .lot-row { margin-bottom: 10px; font-weight: bold; }
+
+    button:hover {
+      background-color: #006be6;
+    }
+
+    #resultCard {
+      display: none;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 0.85rem;
+    }
+
+    th, td {
+      border: 1px solid #333;
+      padding: 6px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #2c2c2c;
+    }
+
+    .valid-row {
+      background-color: #1f4d1f;
+      color: #e8ffe8;
+    }
+
+    .best-row {
+      background-color: #2a7f2a;
+      color: white;
+      font-weight: bold;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        height: auto;
+        padding: 20px 0;
+        align-items: flex-start;
+        display: flex;
+        justify-content: center;
+      }
+
+      #container {
+        flex-direction: column;
+        gap: 20px;
+        width: 100%;
+        padding: 0 15px;
+        justify-content: center;
+      }
+
+      .card {
+        width: 100% !important;
+        max-width: 350px;
+        margin: auto;
+        box-sizing: border-box;
+        padding: 15px;
+      }
+
+      h2 {
+        font-size: 1.3rem;
+      }
+
+      input, select {
+        font-size: 0.95rem;
+        padding: 8px;
+      }
+
+      button {
+        padding: 12px;
+        font-size: 1rem;
+      }
+
+      table {
+        font-size: 0.8rem;
+      }
+    }
   </style>
 </head>
 
 <body>
-  <div class="card">
-    <h2>Calculadora de Riesgo</h2>
+  <div id="container">
 
-    <!-- Divisa -->
-    <label>Divisa</label>
-    <select id="currency">
-      <option value="USD">USD</option>
-      <option value="MXN">MXN</option>
-      <option value="EUR">EUR</option>
-    </select>
+    <!-- INPUTS (minimalistas) -->
+    <div class="card" id="inputCard">
+      <h2>DATOS</h2>
 
-    <!-- Tipo de cuenta -->
-    <label>Tipo de Cuenta</label>
-    <select id="accountType">
-      <option value="std">Estándar (XAU 1 tic = $0.10)</option>
-      <option value="pro">PRO (XAU 1 tic = $0.01)</option>
-    </select>
+      <label for="symbol">Divisa:</label>
+      <select id="symbol">
+        <option value="EUR/USD">EUR/USD</option>
+        <option value="USD/JPY">USD/JPY</option>
+        <option value="GBP/USD">GBP/USD</option>
+        <option value="XAU/USD_OANDA">XAU/USD OANDA</option>
+        <option value="XAU/USD">XAU/USD IC Markets</option>
+      </select>
 
-    <!-- Capital -->
-    <label>Capital</label>
-    <input type="number" id="capital" placeholder="Ej: 5000" />
+      <label for="comision">Tipo de Cuenta:</label>
+      <select id="comision">
+        <!-- valores = comisión por lote en USD -->
+        <option value="7">Apollo — $7 por lote</option>
+        <option value="6">Personal — $6 por lote</option>
+      </select>
 
-    <!-- SL en tics -->
-    <label>Tics de SL</label>
-    <input type="number" id="slTics" placeholder="Ej: 200" inputmode="numeric" />
+      <label for="capital">Capital ($):</label>
+      <select id="capital">
+        <option value="1000">$1,000</option>
+        <option value="5000">$5,000</option>
+        <option value="6000">$6,000</option>
+        <option value="10000">$10,000</option>
+        <option value="15000">$15,000</option>
+        <option value="20000">$20,000</option>
+        <option value="25000">$25,000</option>
+        <option value="50000">$50,000</option>
+        <option value="100000">$100,000</option>
+        <option value="200000">$200,000</option>
+      </select>
 
-    <!-- Resultados -->
-    <div class="result-box">
-      <h3>Resultados de Riesgo</h3>
-      <div id="results"></div>
+      <label for="slTics">Tics SL:</label>
+      <input type="number" inputmode="numeric" pattern="[0-9]" id="slTics" step="1" />
+
+      <button onclick="calcular()">Calcular opciones válidas</button>
     </div>
+
+    <!-- RESULTADOS: tabla de opciones válidas -->
+    <div class="card" id="resultCard">
+      <h2>OPCIONES DE RIESGO (tics ≥ SL)</h2>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Riesgo %</th>
+            <th>Lotaje</th>
+            <th>TicsMáx</th>
+            <th>Gap</th>
+          </tr>
+        </thead>
+        <tbody id="optionsTable"></tbody>
+      </table>
+    </div>
+
   </div>
 
-  <script>
-    // Riesgos internos (ocultos al usuario)
-    const riskPercents = [0.0005, 0.0010, 0.00125, 0.0015, 0.0020, 0.0025, 0.0050, 0.01];
+<script>
+function calcular() {
+  // Riesgos internos (ocultos; en fracción decimal: 0.0005 = 0.05%)
+  const riskArray = [0.0005, 0.0010, 0.00125, 0.0015, 0.0020, 0.0025, 0.0050, 0.01];
 
-    // Valores por tic dependiendo del tipo de cuenta
-    function getTicValue(accountType) {
-      return accountType === "std" ? 0.10 : 0.01;
-    }
+  const simbolo = document.getElementById('symbol').value;
+  const comision = parseFloat(document.getElementById('comision').value); // $ por lote
+  const capital = parseFloat(document.getElementById('capital').value);
+  const slTics = parseFloat(document.getElementById('slTics').value);
 
-    function calculate() {
-      const capital = parseFloat(document.getElementById("capital").value);
-      const slTics = parseFloat(document.getElementById("slTics").value);
-      const accountType = document.getElementById("accountType").value;
+  if (isNaN(slTics) || slTics <= 0) {
+    alert("Introduce Tics SL válidos (>0).");
+    return;
+  }
 
-      const resultsDiv = document.getElementById("results");
-      resultsDiv.innerHTML = "";
+  // Parametrización por símbolo (mismos valores que en tu código original)
+  let valorPorTickPorLote, valorTickPrecio, decimales, contratos;
+  if(simbolo === "XAU/USD"){ 
+    valorPorTickPorLote = 1; valorTickPrecio = 0.01; decimales = 2; contratos = 100; 
+  } else if(simbolo === "XAU/USD_OANDA"){ 
+    valorPorTickPorLote = 0.1; valorTickPrecio = 0.001; decimales = 3; contratos = 100; 
+  } else if(simbolo === "EUR/USD"){ 
+    valorPorTickPorLote = 1; valorTickPrecio = 0.00001; decimales = 5; contratos = 100000;
+  } else if(simbolo === "GBP/USD"){ 
+    valorPorTickPorLote = 1; valorTickPrecio = 0.00001; decimales = 5; contratos = 100000;
+  } else if(simbolo === "USD/JPY"){ 
+    valorPorTickPorLote = 1; valorTickPrecio = 0.00001; decimales = 5; contratos = 100000;
+  } else {
+    valorPorTickPorLote = 1; valorTickPrecio = 0.0001; decimales = 5; contratos = 100000;
+  }
 
-      if (isNaN(capital) || isNaN(slTics) || slTics <= 0) return;
+  const DECIMALES_LOTE = 2;
+  const factor = Math.pow(10, DECIMALES_LOTE);
 
-      const ticValue = getTicValue(accountType);
+  const table = document.getElementById('optionsTable');
+  table.innerHTML = "";
 
-      riskPercents.forEach(risk => {
-        const moneyRisk = capital * risk;
-        const lossPerLot = slTics * ticValue * 100; // 100 tics por lote estándar en XAU
-        const lots = moneyRisk / lossPerLot;
+  let validOptions = [];
 
-        const row = document.createElement("div");
-        row.classList.add("lot-row");
-        row.textContent = `${(risk * 100).toFixed(3)}% → ${lots.toFixed(3)} lotes`;
-        resultsDiv.appendChild(row);
+  riskArray.forEach(r => {
+    const RiesgoDinero = capital * r; // dinero equivalente del riesgo
+
+    // cálculo de lotaje usando la misma lógica original (considerando comisión fija por lote)
+    // lotRaw = RiesgoDinero / (slTics * valorPorTickPorLote + comision)
+    let lotRaw = RiesgoDinero / (slTics * valorPorTickPorLote + comision);
+
+    // redondeo hacia abajo a DECIMALES_LOTE (igual que en tu código)
+    let lotRounded = Math.floor(lotRaw * factor) / factor;
+
+    // descartamos lotajes menores a 0.01 (MT5 min)
+    if (!isFinite(lotRounded) || lotRounded < 0.01) return;
+
+    // comisión real para ese lotaje
+    const comisionParaLot = lotRounded * comision;
+
+    // tics máximos necesarios para consumir el RiesgoDinero con ese lotaje
+    // ticsMax = (RiesgoDinero - comisionParaLot) / (valorPorTickPorLote * lotRounded)
+    // si comisionParaLot >= RiesgoDinero -> imposible (descartar)
+    const numerador = RiesgoDinero - comisionParaLot;
+    if (numerador <= 0) return;
+
+    let ticsMaxRaw = numerador / (valorPorTickPorLote * lotRounded);
+    let ticsMax = Math.ceil(ticsMaxRaw);
+    if (!isFinite(ticsMax) || ticsMax <= 0) return;
+
+    const gap = ticsMax - slTics;
+    if (ticsMax >= slTics) {
+      validOptions.push({
+        riesgo: r,
+        lot: lotRounded,
+        ticsMax,
+        gap
       });
     }
+  });
 
-    document.querySelectorAll("input, select").forEach(el => {
-      el.addEventListener("input", calculate);
-      el.addEventListener("change", calculate);
-    });
-  </script>
+  // ordenar por cercanía absoluta del gap al SL (gap más pequeño primero)
+  validOptions.sort((a,b) => Math.abs(a.gap) - Math.abs(b.gap));
+
+  // marcar la mejor (la más cercana) si existe
+  let bestIndex = validOptions.length > 0 ? 0 : -1;
+
+  validOptions.forEach((opt, idx) => {
+    const rowClass = (idx === bestIndex) ? "best-row" : "valid-row";
+    table.insertAdjacentHTML('beforeend', `
+      <tr class="${rowClass}">
+        <td>${(opt.riesgo*100).toFixed(3)}%</td>
+        <td>${opt.lot.toFixed(DECIMALES_LOTE)}</td>
+        <td>${opt.ticsMax}</td>
+        <td>${opt.gap >= 0 ? '+'+opt.gap : opt.gap}</td>
+      </tr>
+    `);
+  });
+
+  if (validOptions.length === 0) {
+    table.insertAdjacentHTML('beforeend', `<tr><td colspan="4">No hay opciones válidas para SL = ${slTics} tics (lotes >= 0.01).</td></tr>`);
+  }
+
+  document.getElementById('resultCard').style.display='block';
+  document.getElementById('container').style.justifyContent='flex-start';
+}
+</script>
+
 </body>
 </html>
