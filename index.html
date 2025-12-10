@@ -217,11 +217,11 @@
 
 <script>
 function calcular() {
-  // Riesgos internos (ocultos; en fracción decimal: 0.0005 = 0.05%)
+  // Riesgos internos
   const riskArray = [0.0005, 0.0010, 0.00125, 0.0015, 0.0020, 0.0025, 0.0050, 0.01];
 
   const simbolo = document.getElementById('symbol').value;
-  const comision = parseFloat(document.getElementById('comision').value); // $ por lote
+  const comision = parseFloat(document.getElementById('comision').value);
   const capital = parseFloat(document.getElementById('capital').value);
   const slTics = parseFloat(document.getElementById('slTics').value);
 
@@ -230,7 +230,6 @@ function calcular() {
     return;
   }
 
-  // Parametrización por símbolo (mismos valores que en tu código original)
   let valorPorTickPorLote, valorTickPrecio, decimales, contratos;
   if(simbolo === "XAU/USD"){ 
     valorPorTickPorLote = 1; valorTickPrecio = 0.01; decimales = 2; contratos = 100; 
@@ -255,24 +254,14 @@ function calcular() {
   let validOptions = [];
 
   riskArray.forEach(r => {
-    const RiesgoDinero = capital * r; // dinero equivalente del riesgo
+    const RiesgoDinero = capital * r;
 
-    // cálculo de lotaje usando la misma lógica original (considerando comisión fija por lote)
-    // lotRaw = RiesgoDinero / (slTics * valorPorTickPorLote + comision)
     let lotRaw = RiesgoDinero / (slTics * valorPorTickPorLote + comision);
-
-    // redondeo hacia abajo a DECIMALES_LOTE (igual que en tu código)
     let lotRounded = Math.floor(lotRaw * factor) / factor;
 
-    // descartamos lotajes menores a 0.01 (MT5 min)
     if (!isFinite(lotRounded) || lotRounded < 0.01) return;
 
-    // comisión real para ese lotaje
     const comisionParaLot = lotRounded * comision;
-
-    // tics máximos necesarios para consumir el RiesgoDinero con ese lotaje
-    // ticsMax = (RiesgoDinero - comisionParaLot) / (valorPorTickPorLote * lotRounded)
-    // si comisionParaLot >= RiesgoDinero -> imposible (descartar)
     const numerador = RiesgoDinero - comisionParaLot;
     if (numerador <= 0) return;
 
@@ -280,21 +269,23 @@ function calcular() {
     let ticsMax = Math.ceil(ticsMaxRaw);
     if (!isFinite(ticsMax) || ticsMax <= 0) return;
 
+    // ==== AJUSTE QUE PEDISTE ====
+    ticsMax = ticsMax - 1;        // Restar 1 tic SIEMPRE
+    if (ticsMax < slTics) return; // Si queda por debajo del SL ingresado → descartar
+    // ============================
+
     const gap = ticsMax - slTics;
-    if (ticsMax >= slTics) {
-      validOptions.push({
-        riesgo: r,
-        lot: lotRounded,
-        ticsMax,
-        gap
-      });
-    }
+
+    validOptions.push({
+      riesgo: r,
+      lot: lotRounded,
+      ticsMax,
+      gap
+    });
   });
 
-  // ordenar por cercanía absoluta del gap al SL (gap más pequeño primero)
   validOptions.sort((a,b) => Math.abs(a.gap) - Math.abs(b.gap));
 
-  // marcar la mejor (la más cercana) si existe
   let bestIndex = validOptions.length > 0 ? 0 : -1;
 
   validOptions.forEach((opt, idx) => {
@@ -310,7 +301,7 @@ function calcular() {
   });
 
   if (validOptions.length === 0) {
-    table.insertAdjacentHTML('beforeend', `<tr><td colspan="4">No hay opciones válidas para SL = ${slTics} tics (lotes >= 0.01).</td></tr>`);
+    table.insertAdjacentHTML('beforeend', `<tr><td colspan="4">No hay opciones válidas para SL = ${slTics} tics (lotes ≥ 0.01).</td></tr>`);
   }
 
   document.getElementById('resultCard').style.display='block';
