@@ -164,8 +164,9 @@
       <label for="symbol">Divisa:</label>
       <select id="symbol">
         <option value="EUR/USD">EUR/USD</option>
-        <option value="USD/JPY">USD/JPY</option>
         <option value="GBP/USD">GBP/USD</option>
+        <option value="USD/JPY">USD/JPY</option>
+        <option value="AUD/USD">AUD/USD</option>
         <option value="XAU/USD_OANDA">XAU/USD OANDA</option>
         <option value="XAU/USD">XAU/USD IC Markets</option>
       </select>
@@ -244,6 +245,8 @@ function calcular() {
     valorPorTickPorLote = 1; valorTickPrecio = 0.00001; decimales = 5; contratos = 100000;
   } else if(simbolo === "GBP/USD"){ 
     valorPorTickPorLote = 1; valorTickPrecio = 0.00001; decimales = 5; contratos = 100000;
+  } else if(simbolo === "AUD/USD"){ 
+    valorPorTickPorLote = 1; valorTickPrecio = 0.00001; decimales = 5; contratos = 100000;  
   } else if(simbolo === "USD/JPY"){ 
     valorPorTickPorLote = 1; valorTickPrecio = 0.00001; decimales = 5; contratos = 100000;
   } else {
